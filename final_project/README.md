@@ -1,8 +1,13 @@
 # CM3-Final
-*Team: Avi Engbrecht, Pascal Hübner*
+
+# Date: 02/27/2025
+# Investment Return Calculator
+# Team: Avi Engbrecht, Pascal Hübner - German-Duo - 
+# Video Demo:
+
+# Description:
 
 This is our final for Computer Sience at Hult International Business School in CM3
-
 
 Introduction
 
