@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
 from fpdf import FPDF
+import io
 
 # Set up the Streamlit app
 st.set_page_config(page_title='Investment Return Calculator', layout='centered', initial_sidebar_state='expanded')
@@ -74,37 +75,35 @@ try:
         df = pd.DataFrame({'Period': range(1, total_periods + 1), 'Portfolio Value ($)': investment_values})
         st.dataframe(df)
 
-        # Risk & Volatility Analysis
+        # PDF Export
         st.markdown("---")
-        st.header('📉 Risk & Volatility Analysis')
-        returns = pd.Series(investment_values).pct_change().dropna()
-        volatility = returns.std() * np.sqrt(compoundings_per_year)
-        st.write(f'Estimated Volatility (Standard Deviation): **{volatility:.2%}**')
+        st.header('📄 Export Results as PDF')
+        if st.button('📝 Download PDF Report'):
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font('Arial', 'B', 16)
+            pdf.cell(200, 10, txt='Investment Return Calculator Report', ln=True, align='C')
+            pdf.ln(10)
+            pdf.set_font('Arial', '', 12)
+            pdf.cell(200, 10, txt=f'Initial Investment: ${initial_investment:,.2f}', ln=True)
+            pdf.cell(200, 10, txt=f'Monthly Contribution: ${monthly_contribution:,.2f}', ln=True)
+            pdf.cell(200, 10, txt=f'Annual Return Rate: {annual_interest_rate:.2f}%', ln=True)
+            pdf.cell(200, 10, txt=f'Investment Duration: {years} years', ln=True)
+            pdf.cell(200, 10, txt=f'Estimated Portfolio Value: ${total_value:,.2f}', ln=True)
+            pdf.cell(200, 10, txt=f'Investment Goal: ${investment_goal:,.2f}', ln=True)
+            pdf_filename = 'Investment_Return_Calculator_Report.pdf'
+            pdf.output(pdf_filename)
+            with open(pdf_filename, 'rb') as f:
+                st.download_button(label='📄 Download PDF', data=f, file_name=pdf_filename, mime='application/pdf')
 
-        # Scenario Comparison Tool
+        # Excel Export
         st.markdown("---")
-        st.header('🆚 Scenario Comparison Tool')
-        alt_return_rate = st.slider('Alternative Annual Return Rate (%)', 0.0, 20.0, 7.0)
-
-        if alt_return_rate >= 0 and compoundings_per_year > 0:
-            alt_periodic_rate = (alt_return_rate / 100) / compoundings_per_year
-            alt_investment_values = []
-            alt_total_value = initial_investment
-            for period in range(1, total_periods + 1):
-                alt_total_value = alt_total_value * (1 + alt_periodic_rate) + monthly_contribution * (1 + alt_periodic_rate)
-                alt_investment_values.append(alt_total_value)
-
-            plt.figure(figsize=(10, 6))
-            plt.plot(investment_values, label='Original Scenario', color='teal')
-            plt.plot(alt_investment_values, label='Alternative Scenario', color='orange')
-            plt.xlabel('Time (Periods)')
-            plt.ylabel('Portfolio Value ($)')
-            plt.title('Scenario Comparison')
-            plt.legend()
-            plt.grid(True)
-            st.pyplot(plt.gcf())
-        else:
-            st.warning('⚠️ Please ensure a valid alternative return rate and compounding frequency.')
+        st.header('📊 Export Results as Excel')
+        output = io.BytesIO()
+        with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+            df.to_excel(writer, index=False, sheet_name='Investment Growth')
+            writer.save()
+            st.download_button(label='📊 Download Excel', data=output.getvalue(), file_name='Investment_Return_Calculator.xlsx', mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 except Exception as e:
     st.error(f'⚠️ An unexpected error occurred: {str(e)}')
