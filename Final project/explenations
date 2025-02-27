@@ -12,14 +12,12 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from datetime import datetime
-from fpdf import FPDF
 import io
 ```
 - **Streamlit:** Used for building the web application.
 - **Pandas & Numpy:** For data manipulation and analysis.
 - **Matplotlib:** To create data visualizations.
 - **Datetime:** For date and time operations.
-- **FPDF:** For generating PDF reports.
 - **io:** To handle file input/output operations.
 
 ---
