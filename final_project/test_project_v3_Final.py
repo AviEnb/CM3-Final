@@ -1,5 +1,5 @@
 import pytest
-from project_v3_Final import calculate_investment_growth, calculate_volatility, scenario_comparison
+from final_project.project_v3_final import calculate_investment_growth, calculate_volatility, scenario_comparison
 
 # Test for investment growth calculation
 def test_calculate_investment_growth():
